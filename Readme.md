@@ -1,35 +1,34 @@
-note  append  to the first line in this  file sudo nano /boot/cmdline.txt for all pi's!
-  cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
-
-
+# Setting up a K3S cluster on Raspberry Pi's.
+### Notes
+* you will need a few Raspberry Pi's its recommended to have one dedicated for the master node and the rest can be allocated for the workers.
+### Setting up the PI's
+* Setup the Pi's with the current version of Raspbian.Configure individual hostnames in each. Presumably they would be setup to run headless with ssh enabled, and the gpu memory set to the minimum recommended level. More details on how to do it can be found by searching the net.
+* Enable cgroups.  Append  to the first line in this  file  /boot/cmdline.txt for all pi's.
+```
+    cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+```
+* Install K3S master by running the following command on the Pi selected as the master:
+```
 install K3S master curl -sfL https://get.k3s.io | sh -
-
-get the token sudo cat /var/lib/rancher/k3s/server/node-token
-
-192.168.0.80 (k3s Master) k3s Token K102812b94390ea9bc2279e7739d18dad8f26dd295da9bbfb184b2029d51c5147b3::server:65d8c7416379988141bae208a42402b4
-
-installing the agent.
-1) add the host name
-
-3) run curl -sfL http://get.k3s.io | K3S_URL=https://RPI80:6443 \
-K3S_TOKEN=K102812b94390ea9bc2279e7739d18dad8f26dd295da9bbfb184b2029d51c5147b3::server:65d8c7416379988141bae208a42402b4 sh -
-4) check agent status sudo systemctl status k3s-agent
-
-5) check  /etc/systemd/system/k3s-agent.service.env file to change the K3S_URL to https://192.168.0.80:6443 and then restart the k3s-agent serv if the hostname RPI80
-is not resolveable.
-
-
-192.168.0.82/83 (influx and grafana)
-
-192.168.0.84/85
-
-=====
-installing kubectl locally on a windows machine.
-1) install chocolatey.
-2)do the following on a admin enabled powershell console 
-3)run choco install kubernetes-cli 
-4)navigate to the home directory cd ~\
-5)create a .kube directory mkdir .kube
-6) copy over the \etc\rancher\k3s\k3s.yaml file from the master over to the kube directory and rename it as config.
-7)kubectl get nodes command should give you the nodes of your remote clustert.
-
+```
+* Retrieve the K3S Token by running the following on the master node , this is required to join the work installations with the master.
+```
+    sudo cat /var/lib/rancher/k3s/server/node-token
+```
+* Run the worker install's in each of the worker Pi's.
+```
+run curl -sfL http://get.k3s.io | K3S_URL=https://<Master Node Hostname or IP>:6443 K3S_TOKEN=<Token retrieved from above step> sh -
+```
+* Check if everything is up by running kubectl on the master node.
+```
+    kubectl get nodes
+```
+* if there are issues with the workers connecting to the master,check  /etc/systemd/system/k3s-agent.service.env file to change the K3S_URL to https://<IP address of master>:6443 and then restart the k3s-agent serv if the master hostname is not resolveable.
+* You may get tired of having to ssh into the master node to work on your cluster. One option is to install kubectl locally. Here are the instructions to do an installation on windows. This worked on my windows 10 machine.
+    1) Install chocolatey.
+    2) Do the following on a admin enabled powershell console 
+    3) Run choco install kubernetes-cli 
+    4) Navigate to the home directory cd ~\
+    5) Create a .kube directory.
+    6) Copy over the \etc\rancher\k3s\k3s.yaml file from the master over to the .kube directory and rename it as config.
+    7) Test ``` kubectl get nodes ``` command should give you the nodes of your remote cluster.
