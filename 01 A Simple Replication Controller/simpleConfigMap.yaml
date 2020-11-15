@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: simple-config-map
+    labels:
+        app: alpine
+data: 
+    simple.properties: |
+     item1=1
+     item2=2
+     item3=3
