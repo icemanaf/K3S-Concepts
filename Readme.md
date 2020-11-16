@@ -23,7 +23,7 @@ run curl -sfL http://get.k3s.io | K3S_URL=https://<Master Node Hostname or IP>:6
 ```
     kubectl get nodes
 ```
-* if there are issues with the workers connecting to the master,check  /etc/systemd/system/k3s-agent.service.env file to change the K3S_URL to https://<IP address of master>:6443 and then restart the k3s-agent service if the master hostname is not resolveable.
+* if there are issues with the workers connecting to the master,check  /etc/systemd/system/k3s-agent.service.env file to change the K3S_URL to ```https://<IP address of master>:6443``` and then restart the k3s-agent service if the master hostname is not resolveable.
 * You may get tired of having to ssh into the master node to work on your cluster. One option is to install kubectl locally. Here are the instructions to do an installation on Windows. These worked on my Windows 10 machine.
     1) Install chocolatey.
     2) Do the following on a admin enabled powershell console 
